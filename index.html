@@ -34,8 +34,8 @@
         .container {
             width: 90%;
             max-width: 400px;
-            height: 85vh;
-            min-height: 580px;
+            height: 80vh;
+            min-height: 550px;
             background: white;
             border-radius: 30px;
             box-shadow: 0 15px 35px rgba(255, 117, 140, 0.15);
@@ -137,7 +137,7 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 25px solid #333333;
+            border-top: 25px solid #ff3366;
             z-index: 10;
         }
 
@@ -147,7 +147,7 @@
             border-radius: 50%;
             box-shadow: 0 0 0 8px #fff, 0 0 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            /* 7초 동안 긴장감 넘치게 회전 */
+            /* 7초 동안 박진감 넘치게 회전 */
             transition: transform 7s cubic-bezier(0.15, 0.85, 0.2, 1);
         }
 
@@ -235,7 +235,7 @@
         const canvas = document.getElementById('rouletteCanvas');
         const ctx = canvas.getContext('2d');
         
-        // 이미지와 동일하게 12시 방향부터 순서대로 배치 (아디다스가 12시, 버켄스탁이 4시 방향)
+        // 원하셨던 순서대로 배치 (아디다스 12시, 버켄스탁 4시)
         const candidates = ['아디다스', '크록스', '버켄스탁', '다이소', '채은이가 다시 뽑기'];
         const colors = ['#ffd6a5', '#9bf6ff', '#ffadad', '#caffbf', '#ffc6ff'];
         
@@ -246,46 +246,32 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. 먼저 부채꼴 배경 색상들을 그립니다.
             for (let i = 0; i < numSegments; i++) {
-                // 12시 방향(-Math.PI/2)에서 살짝 왼쪽으로 틀어 아디다스 칸이 12시에 정중앙으로 오게 기준각 조정
+                // 원래 원하셨던 칸 정중앙 회전 방식으로 롤렛 복구
                 const startAngle = i * anglePerSegment - Math.PI / 2 - (anglePerSegment / 2);
                 const endAngle = startAngle + anglePerSegment;
 
+                // 부채꼴 색칠
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, startAngle, endAngle);
                 ctx.fillStyle = colors[i];
                 ctx.fill();
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
-            }
 
-            // 2. 글자가 회전하지 않고 수평으로 이쁘게 들어가도록 좌표를 정밀 계산하여 따로 그립니다.
-            for (let i = 0; i < numSegments; i++) {
-                const startAngle = i * anglePerSegment - Math.PI / 2 - (anglePerSegment / 2);
-                const midAngle = startAngle + (anglePerSegment / 2); // 각 칸의 정중앙 각도
-
-                // 글자가 배치될 중심 반지름 위치 (중앙에서 약간 바깥쪽 부근)
-                const textRadius = radius * 0.55; 
-                const textX = radius + Math.cos(midAngle) * textRadius;
-                const textY = radius + Math.sin(midAngle) * textRadius;
-
+                // 원래의 예뻤던 폰트 회전 렌더링 방식으로 롤백 (정중앙 정렬)
                 ctx.save();
-                ctx.textAlign = 'center';
+                ctx.translate(radius, radius);
+                ctx.rotate(startAngle + anglePerSegment / 2);
+                ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#4a4a4a';
-                ctx.font = 'bold 16px Gowun Dodum';
-
-                // '채은이가 다시 뽑기' 처럼 긴 문장은 두 줄로 나누어 예쁘게 출력
-                if (candidates[i].includes(' ')) {
-                    const words = candidates[i].split(' ');
-                    ctx.fillText(words[0] + ' ' + words[1], textX, textY - 9);
-                    ctx.fillText(words[2] + ' ' + words[3], textX, textY + 9);
-                } else {
-                    ctx.fillText(candidates[i], textX, textY);
-                }
+                ctx.font = 'bold 14px Gowun Dodum';
+                
+                // 이상한 undefined 유발 코드 삭제하고 텍스트 깔끔하게 한 줄 출력
+                ctx.fillText(candidates[i], radius - 20, 0);
                 ctx.restore();
             }
         }
@@ -303,20 +289,17 @@
 
             const wrap = document.getElementById('canvas-wrap');
             
-            // 현재 배열에서 '버켄스탁'은 2번째 인덱스(0부터 시작)에 위치해 있습니다.
-            // 룰렛이 멈췄을 때 12시 화살표가 '버켄스탁' 칸의 정확한 중앙을 가리키도록 정밀 각도 셋팅
+            // 현재 배열에서 '버켄스탁'은 2번째 인덱스입니다.
+            // 멈췄을 때 12시 화살표가 '버켄스탁' 칸 정중앙을 찌르도록 각도 셋팅
             const totalSegments = 5;
-            const targetSegmentIndex = 2; // 버켄스탁
+            const targetSegmentIndex = 2; 
             
             const baseAngle = 360 - (360 / totalSegments) * targetSegmentIndex;
-            
-            // 7초 동안 긴장감 넘치게 많이 돌리기 위한 세바퀴 회전값 추가
             const extraSpins = (14 + Math.floor(Math.random() * 4)) * 360; 
             const finalRotation = extraSpins + baseAngle;
 
             wrap.style.transform = `rotate(${finalRotation}deg)`;
 
-            // 7.2초 뒤 결과 화면 띄우기
             setTimeout(() => {
                 nextPage(4);
             }, 7200); 
