@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>명규의 생일선물은?!</title>
-    <!-- 구글 폰트 적용 (귀여운 폰트) -->
-    <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #ff758c;
@@ -18,7 +16,8 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Gowun Dodum', sans-serif;
+            /* 애플 기본 폰트 스타일 시스템 적용 */
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
         }
 
         body {
@@ -73,15 +72,14 @@
             color: white;
             border: none;
             padding: 15px 40px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
             transition: all 0.2s ease;
             margin-top: 30px;
-            font-family: 'Gamja Flower', cursive;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .btn:active {
@@ -102,15 +100,23 @@
         }
 
         h1 {
-            font-family: 'Gamja Flower', cursive;
-            font-size: 2.3rem;
+            font-size: 2rem;
+            font-weight: 800;
             color: #ff5e7e;
             line-height: 1.4;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff758c;
+            margin-bottom: 10px;
         }
 
         /* 2페이지 스타일 */
         .welcome-text {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             line-height: 1.6;
             word-break: keep-all;
         }
@@ -147,8 +153,8 @@
             border-radius: 50%;
             box-shadow: 0 0 0 8px #fff, 0 0 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            /* 7초 동안 박진감 넘치게 회전 */
-            transition: transform 7s cubic-bezier(0.15, 0.85, 0.2, 1);
+            /* 베지에 곡선을 수정하여 막판에 아주 천천히 스르륵 멈추도록 조정 (7.5초 연출) */
+            transition: transform 7.5s cubic-bezier(0.1, 0.9, 0.15, 1);
         }
 
         canvas {
@@ -183,14 +189,12 @@
 <body>
 
     <div class="container">
-        <!-- 1번 화면: 랜딩 페이지 -->
         <div id="page1" class="page active">
             <div class="emoticon">🎁✨</div>
             <h1>명규의 생일선물은 ?!</h1>
             <button class="btn" onclick="nextPage(2)">Start !</button>
         </div>
 
-        <!-- 2번 화면: 안내 페이지 -->
         <div id="page2" class="page">
             <div class="emoticon" style="font-size: 3.5rem;">🎉🕺🏻</div>
             <p class="welcome-text">
@@ -200,9 +204,8 @@
             <button class="btn" onclick="nextPage(3)">다음으로</button>
         </div>
 
-        <!-- 3번 화면: 룰렛 페이지 -->
         <div id="page3" class="page">
-            <h2 style="font-family: 'Gamja Flower'; font-size: 1.8rem; color:#ff758c; margin-bottom: 10px;" id="roulette-title">두근두근 룰렛!</h2>
+            <h2 id="roulette-title">두근두근 룰렛!</h2>
             <div class="roulette-container">
                 <div class="arrow"></div>
                 <div class="canvas-wrap" id="canvas-wrap">
@@ -212,10 +215,9 @@
             <button class="btn" id="spin-btn" onclick="spinRoulette()">돌리기</button>
         </div>
 
-        <!-- 4번 화면: 결과 페이지 -->
         <div id="page4" class="page">
             <div class="result-emoticon">🥳🎉👏</div>
-            <h2 style="font-family: 'Gamja Flower'; font-size: 2rem; margin-bottom: 10px;">축하합니다!!</h2>
+            <h2 style="font-size: 1.8rem; margin-bottom: 10px;">축하합니다!!</h2>
             <p>명규오빠에게 딱 어울리는 선물 🎁</p>
             <div class="gift-box">👞 버켄스탁 👞</div>
             <p class="welcome-text" style="font-size: 1.1rem; margin-top: 10px;">선물이 마음에 드시나요? 🥰</p>
@@ -235,7 +237,7 @@
         const canvas = document.getElementById('rouletteCanvas');
         const ctx = canvas.getContext('2d');
         
-        // 원하셨던 순서대로 배치 (아디다스 12시, 버켄스탁 4시)
+        // 순서 고정 (아디다스 12시, 버켄스탁 4시 방향)
         const candidates = ['아디다스', '크록스', '버켄스탁', '다이소', '채은이가 다시 뽑기'];
         const colors = ['#ffd6a5', '#9bf6ff', '#ffadad', '#caffbf', '#ffc6ff'];
         
@@ -247,11 +249,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i = 0; i < numSegments; i++) {
-                // 원래 원하셨던 칸 정중앙 회전 방식으로 롤렛 복구
                 const startAngle = i * anglePerSegment - Math.PI / 2 - (anglePerSegment / 2);
                 const endAngle = startAngle + anglePerSegment;
 
-                // 부채꼴 색칠
+                // 부채꼴 그리기
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
                 ctx.arc(radius, radius, radius, startAngle, endAngle);
@@ -261,16 +262,15 @@
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
 
-                // 원래의 예뻤던 폰트 회전 렌더링 방식으로 롤백 (정중앙 정렬)
+                // 텍스트 회전 방식 정렬 및 글꼴 깔끔하게 세팅
                 ctx.save();
                 ctx.translate(radius, radius);
                 ctx.rotate(startAngle + anglePerSegment / 2);
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#4a4a4a';
-                ctx.font = 'bold 14px Gowun Dodum';
+                ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif';
                 
-                // 이상한 undefined 유발 코드 삭제하고 텍스트 깔끔하게 한 줄 출력
                 ctx.fillText(candidates[i], radius - 20, 0);
                 ctx.restore();
             }
@@ -289,20 +289,27 @@
 
             const wrap = document.getElementById('canvas-wrap');
             
-            // 현재 배열에서 '버켄스탁'은 2번째 인덱스입니다.
-            // 멈췄을 때 12시 화살표가 '버켄스탁' 칸 정중앙을 찌르도록 각도 셋팅
             const totalSegments = 5;
-            const targetSegmentIndex = 2; 
+            const targetSegmentIndex = 2; // 버켄스탁 인덱스
             
-            const baseAngle = 360 - (360 / totalSegments) * targetSegmentIndex;
-            const extraSpins = (14 + Math.floor(Math.random() * 4)) * 360; 
+            // 기존 정중앙 멈춤 공식: 360 - (360 / 5 * 2) = 288도
+            // 한 칸의 각도는 72도이며, 버켄스탁 칸의 3/4(75%) 지점에 멈추기 위해 수학적 오프셋 적용
+            // 중앙(50%)에서 오른쪽 경계선 쪽으로 25%만큼 더 회전하도록 세밀하게 각도를 비틀었습니다.
+            const segmentAngle = 360 / totalSegments; 
+            const centerAngle = 360 - (segmentAngle * targetSegmentIndex);
+            const offsetAngle = segmentAngle * 0.25; // 3/4 지점 안착을 위한 미세 조정값
+            const baseAngle = centerAngle + offsetAngle;
+            
+            // 회전 바퀴 수 대폭 추가 (마구 돌다 천천히 정지)
+            const extraSpins = (16 + Math.floor(Math.random() * 4)) * 360; 
             const finalRotation = extraSpins + baseAngle;
 
             wrap.style.transform = `rotate(${finalRotation}deg)`;
 
+            // 천천히 감속하는 시간과 맞추기 위해 대기 시간을 7.7초로 연장
             setTimeout(() => {
                 nextPage(4);
-            }, 7200); 
+            }, 7700); 
         }
     </script>
 </body>
